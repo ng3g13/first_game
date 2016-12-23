@@ -22,27 +22,27 @@ public class Game extends Canvas implements Runnable{
 	private HUD hud;
 	//declare spawner
 	private Spawn spawner;
+	private Menu menu;
+	
+	public enum STATE {
+		Menu,
+		Help,
+		Game
+	};
+	
+	public STATE gameState = STATE.Menu;
 	
 	public Game(){
 		handler = new Handler();
+		menu = new Menu(this, handler);
 		r = new Random();
 		this.addKeyListener(new KeyInput(handler)); //object created from that class is then registered with a component 
 		//using the component's addKeyListener method. A keyboard event is generated when a key is pressed, released, or typed. The relevant method in the listener object is then invoked, and the KeyEvent is passed to it.
-		
-		new Window((int)WIDTH, (int)HEIGHT, "Let's Build a Game!", this);
-		
+		this.addMouseListener(menu);		
+		new Window((int)WIDTH, (int)HEIGHT, "Let's Build a Game!", this);		
 		hud = new HUD();
 		spawner = new Spawn(handler, hud);
-		
-		
-		//create GameObjects and add to LinkedList
-		handler.addObject(new Player((int)(WIDTH/2 - 32), (int)(HEIGHT/2 -32), ID.Player, handler));
-		
-		
-		//handler.addObject(new BasicEnemy(r.nextInt(WIDTH), r.nextInt(HEIGHT), ID.BasicEnemy, handler));
-		handler.addObject(new BasicEnemy(r.nextInt((int)WIDTH), r.nextInt((int)HEIGHT), ID.BasicEnemy, handler));
-		
-		handler.addObject(new BasicEnemy(r.nextInt((int)WIDTH), r.nextInt((int)HEIGHT), ID.BasicEnemy, handler));
+
 
 	}
 
@@ -93,8 +93,12 @@ public class Game extends Canvas implements Runnable{
 	
 	private void tick(){
 		handler.tick();
-		hud.tick();
-		spawner.tick();
+		if(gameState == STATE.Game){
+			hud.tick();
+			spawner.tick();
+		}else if(gameState == STATE.Menu){
+			menu.tick();
+		}
 	}
 	
 	private void render(){
@@ -112,7 +116,11 @@ public class Game extends Canvas implements Runnable{
 		
 		handler.render(g);
 		
-		hud.render(g); //render on top of everything
+		if(gameState == STATE.Game){
+			hud.render(g);
+		}else if(gameState == STATE.Menu || gameState == STATE.Help){
+			menu.render(g);
+		}
 		
 		g.dispose(); //Dispose the graphics context, release resources.
 		bs.show(); //Makes the next available buffer visible by either copying the memory (blitting) or changing the display pointer (flipping).
