@@ -30,6 +30,7 @@ public class Handler {
 			
 			if(tempObject.getId() == ID.Player) {
 				object.clear(); //if we found player, remove all GameObject then add the same player in the same x, y.
+				if(Game.gameState != Game.STATE.End)
 				addObject(new Player((int)tempObject.getX(), (int)tempObject.getY(), ID.Player, this));
 			}
 		}

@@ -16,23 +16,27 @@ public class Menu extends MouseAdapter{
 	private Game game;
 	private Handler handler;
 	private Random r = new Random();
+	private HUD hud;
 	
-	public Menu(Game game, Handler handler){
+	public Menu(Game game, Handler handler, HUD hud){
 		this.game = game;
 		this.handler = handler;
+		this.hud = hud;
 	}
 
 	public void mousePressed(MouseEvent e){
 		//get x, y coordinates of mouse.
 		int mx = e.getX();
 		int my = e.getY();		
-		
 		if(game.gameState == STATE.Menu){
+		
 			//play button
 			if(mouseOver(mx, my, 210, 150, 200, 64)){
 				game.gameState = STATE.Game;
-				//create GameObjects and add to LinkedList
+				//clear all GameObjects, player hasn't been rendered yet so clearEnemys() can be used. Add player class first so clearEnemys() works.
 				handler.addObject(new Player((int)(Game.WIDTH/2 - 32), (int)(Game.HEIGHT/2 -32), ID.Player, handler));
+				handler.clearEnemys();
+				//create GameObjects and add to LinkedList
 				handler.addObject(new BasicEnemy(r.nextInt((int)Game.WIDTH), r.nextInt((int)Game.HEIGHT), ID.BasicEnemy, handler));			
 				handler.addObject(new BasicEnemy(r.nextInt((int)Game.WIDTH), r.nextInt((int)Game.HEIGHT), ID.BasicEnemy, handler));
 			}
@@ -56,6 +60,22 @@ public class Menu extends MouseAdapter{
 				return; //return to stop us accidently hitting the quit button in menu.
 			}
 		}
+
+		//Try again button
+		if(game.gameState == STATE.End){
+			if(mouseOver(mx, my, 210, 350, 200, 64)){
+				game.gameState = STATE.Game;
+				hud.setLevel(1);
+				hud.setScore(0);
+				//clear all GameObjects, player hasn't been rendered yet so clearEnemys() can be used. Add player class first so clearEnemys() works.
+				handler.addObject(new Player((int)(Game.WIDTH/2 - 32), (int)(Game.HEIGHT/2 -32), ID.Player, handler));
+				handler.clearEnemys();
+				//create GameObjects and add to LinkedList
+				handler.addObject(new BasicEnemy(r.nextInt((int)Game.WIDTH), r.nextInt((int)Game.HEIGHT), ID.BasicEnemy, handler));			
+				handler.addObject(new BasicEnemy(r.nextInt((int)Game.WIDTH), r.nextInt((int)Game.HEIGHT), ID.BasicEnemy, handler));
+			}
+		}
+		
 		
 	}
 	
@@ -86,7 +106,7 @@ public class Menu extends MouseAdapter{
 
 			g.setColor(Color.white);		
 			g.setFont(fnt);
-			g.drawString("Menu", 240, 70);
+			g.drawString("Wave", 240, 70);
 		
 			g.setFont(fnt2);
 
@@ -114,7 +134,23 @@ public class Menu extends MouseAdapter{
 			g.setFont(fnt3);
 			g.drawString("Use WASD keys to move player and dodge enemies", 50, 200);
 
-		}
+		}else if(game.gameState == STATE.End){
+			
+			Font fnt = new Font("arial", 1, 50);
+			Font fnt2 = new Font("arial", 1, 30);
+			Font fnt3 = new Font("arial", 1, 20);
+			
+			g.setColor(Color.white);		
+			g.setFont(fnt);
+			g.drawString("Game Over", 180, 70);
+			
+			g.drawRect(210, 350, 200, 64);
+			g.setFont(fnt2);
+			g.drawString("Try Again", 245, 390);
+			g.setFont(fnt3);
+			g.drawString("You lost with a score of: " + hud.getScore(), 175, 200);
+
+		} 
 	}
 	
 }
